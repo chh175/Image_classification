@@ -47,12 +47,12 @@ tf.app.flags.DEFINE_integer('num_classes', 102, '')
 
 #   保存目录
 tf.app.flags.DEFINE_string('finetune_checkpoint', 'checkpoint/mobilenet_v2_1.0_224/mobilenet_v2_1.0_224.ckpt', '')
-tf.app.flags.DEFINE_string('save_model_dir', 'flower_train_model', '')
-tf.app.flags.DEFINE_string('save_log_dir', 'flower_train_log', '')
+tf.app.flags.DEFINE_string('save_model_dir', 'float_flower_train_model', '')
+tf.app.flags.DEFINE_string('save_log_dir', 'float_flower_train_log', '')
 
 #   一些参数
 tf.app.flags.DEFINE_integer('num_epochs', 50, '')
-tf.app.flags.DEFINE_bool('quantize', True, '')
+tf.app.flags.DEFINE_bool('quantize', False, '')
 tf.app.flags.DEFINE_float('weight_decay', 0.00004, '')
 tf.app.flags.DEFINE_float('init_learning_rate', 1e-3, '')
 tf.app.flags.DEFINE_float('learning_rate_decay_factor', 0.94, '')
@@ -77,11 +77,9 @@ def TFrecord_dataset_input(is_training):
     if is_training:
         dataset_split = 'train'
         batch_size = FLAGS.train_batch_size 
-        thread = 4
     else:
         dataset_split = 'validation'
         batch_size = FLAGS.eval_batch_size 
-        thread = 1
                     
     dataset = dataset_factory.get_dataset(FLAGS.dataset_name, dataset_split, FLAGS.dataset_dir)
                                                   
@@ -101,7 +99,7 @@ def TFrecord_dataset_input(is_training):
     images, labels = tf.train.batch(
           [image, label],
           batch_size=batch_size,
-          num_threads=thread,
+          num_threads=4,
           capacity=5 * batch_size)
       
 #    labels = slim.one_hot_encoding(labels, FLAGS.num_classes)
